@@ -1,0 +1,66 @@
+현재 디렉토리의 개발 티켓과 AORR.md를 읽고, 이 개발 루프의 영구 상태와 가드레일을 관리할 MEMORY.md를 작성해줘.
+
+MEMORY.md에는 핵심 내용만 포함하고 다음 구조를 사용해:
+
+1. Goal
+   - 최종 개발 목표
+   - 완료 조건
+
+2. Current Scope
+   - 현재 구현할 범위
+   - 수정 가능한 파일과 디렉토리
+
+3. Current State
+   - 현재 상태
+   - 완료된 작업
+   - 다음에 수행할 작업
+   - 현재 Blocker
+
+4. Guardrails
+   - 테스트 삭제 또는 완화 금지
+   - API 스펙 임의 변경 금지
+   - 인증·권한 로직 임의 변경 금지
+   - 대규모 리팩토링 금지
+   - 운영 배포 금지
+   - 토큰, 비밀키, 개인정보 출력 및 커밋 금지
+
+5. Verifier
+   - 테스트 명령어
+   - Lint, Type Check, Build 명령어
+   - 통과 기준
+
+6. Retry Policy
+   - 최대 Retry 3회
+   - 동일 오류 fingerprint 2회 반복 시 정지
+   - Retry마다 최소 수정만 허용
+
+7. HITL Conditions
+   - 요구사항이 불명확한 경우
+   - API, 인증, 권한, 외부 서비스 변경
+   - 운영 배포
+   - Retry 한계 도달
+   - 테스트를 실행할 수 없는 환경 문제
+
+8. Tool Policy
+   - Codex는 작업 제어와 코드 변경을 담당
+   - 가능하면 Claude Code CLI를 독립 Verifier로 활용
+   - Sonnet 5 사용 가능 여부를 확인하고, 실제 사용 모델을 기록
+   - 토큰 값은 읽거나 출력하거나 MEMORY.md에 기록하지 않음
+
+9. Execution Log Template
+   - 실행 번호
+   - 시작 시각
+   - 목표
+   - 상태
+   - 가설
+   - 수행한 Act
+   - 변경 파일
+   - 실행한 Verifier
+   - 결과와 exit code
+   - 오류 fingerprint
+   - Retry 횟수
+   - 다음 행동
+   - 사람 확인 필요 항목
+
+아직 코드를 수정하거나 테스트를 실행하지 마.
+작성한 MEMORY.md를 현재 디렉토리에 저장하고, 저장 후 필수 항목이 모두 포함되었는지 확인해줘.
