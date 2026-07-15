@@ -3,20 +3,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>jvurglar-lgtm | Pro Portfolio</title>
+    <title>jvurglar-lgtm | Game Developer Portfolio</title>
     <meta
       name="description"
-      content="jvurglar-lgtm의 반응형 개인 프로페셔널 웹사이트와 Games 영역."
+      content="jvurglar-lgtm의 반응형 개인 포트폴리오와 Snake, Tetris 미니게임이 함께 있는 정적 웹사이트."
     />
     <link rel="stylesheet" href="./styles.css" />
-    <script defer src="./script.js"></script>
+    <script type="module" defer src="./script.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">본문으로 건너뛰기</a>
 
     <header class="site-header">
       <div class="brand">
-        <p class="eyebrow">Portfolio</p>
+        <p class="eyebrow">Game Developer</p>
         <a class="brand-link" href="#home">jvurglar-lgtm</a>
       </div>
 
@@ -36,83 +36,192 @@
 
     <main id="main">
       <section id="home" class="hero">
-        <p class="hero-kicker">Product-minded builder</p>
-        <h1>반응형 개인 프로페셔널 웹사이트</h1>
+        <p class="hero-kicker">Browser-first game dev</p>
+        <h1>플레이 감각이 살아있는 반응형 포트폴리오</h1>
         <p class="hero-copy">
-          정적 HTML, CSS, JavaScript만으로 구성한 소개 사이트입니다. 모바일부터 데스크톱까지 자연스럽게
-          보이도록 설계합니다.
+          jvurglar-lgtm의 개인 사이트는 게임 개발자의 시선으로 정리한 정적 포트폴리오입니다.
+          모바일에서도 편하게 읽히고, 상단 Games 탭에서는 바로 즐길 수 있는 미니게임을 함께 제공합니다.
         </p>
         <div class="hero-actions">
           <a class="button button-primary" href="#games">Games 보기</a>
-          <a class="button button-secondary" href="#contact">연락처 보기</a>
+          <a class="button button-secondary" href="#contact">Contact 보기</a>
         </div>
       </section>
 
       <section id="about" class="card-section">
-        <h2>About</h2>
-        <p>여기에 자기소개, 경력, 관심 분야, 링크를 넣을 수 있습니다.</p>
+        <div class="section-heading">
+          <p class="eyebrow">About</p>
+          <h2>게임 개발자 중심의 소개</h2>
+        </div>
+        <div class="profile-grid">
+          <article class="profile-card">
+            <h3>Focus</h3>
+            <p>브라우저 게임, 직관적인 인터랙션, 모바일 대응 UI를 중심으로 작업합니다.</p>
+          </article>
+          <article class="profile-card">
+            <h3>Stack</h3>
+            <p>정적 HTML, CSS, JavaScript로 빠르게 만들고, 유지보수가 쉬운 구조를 선호합니다.</p>
+          </article>
+          <article class="profile-card">
+            <h3>Style</h3>
+            <p>Facebook 스타일의 선명한 블루 톤과 깔끔한 카드 레이아웃을 기반으로 설계했습니다.</p>
+          </article>
+        </div>
       </section>
 
       <section id="projects" class="card-section">
-        <h2>Projects</h2>
-        <p>대표 프로젝트, 성과, 기술 스택을 카드 형태로 배치할 수 있습니다.</p>
+        <div class="section-heading">
+          <p class="eyebrow">Projects</p>
+          <h2>프로젝트 구성</h2>
+        </div>
+        <p>
+          개인 포트폴리오, 미니 게임, 상호작용 요소를 한 화면 안에서 연결해
+          방문자가 빠르게 내용을 이해하도록 구성했습니다.
+        </p>
       </section>
 
       <section id="experience" class="card-section">
-        <h2>Experience</h2>
-        <p>검증된 경력 항목은 여기에 정리합니다. 확인되지 않은 내용은 넣지 않습니다.</p>
+        <div class="section-heading">
+          <p class="eyebrow">Experience</p>
+          <h2>개발 경험</h2>
+        </div>
+        <p>
+          반응형 레이아웃, 캔버스 기반 게임 루프, 입력 처리와 상태 전환 같은
+          프런트엔드 실전 요소를 꾸준히 다듬는 방향으로 설명했습니다.
+        </p>
       </section>
 
       <section id="research" class="card-section">
-        <h2>Research</h2>
-        <p>확인 가능한 연구, 실험, 학습 성과를 요약할 수 있습니다.</p>
+        <div class="section-heading">
+          <p class="eyebrow">Research</p>
+          <h2>관심 분야</h2>
+        </div>
+        <p>
+          게임 UX, 웹 성능, 터치 조작성, 작은 범위의 반복 개선을 탐구하는 흐름으로 정리했습니다.
+        </p>
       </section>
 
       <section id="games" class="card-section games-section">
         <div class="section-heading">
-          <h2>Games</h2>
-          <p>키보드와 모바일 버튼으로 조작하는 지렁이 게임입니다. 랜덤하게 움직이는 적 2개가 포함됩니다.</p>
+          <p class="eyebrow">Games</p>
+          <h2>Snake와 Tetris 미니게임</h2>
+          <p>
+            키보드와 모바일 터치를 모두 고려한 게임 영역입니다. Snake는 방향키와 터치로,
+            Tetris는 방향키와 전용 조작 버튼으로 플레이할 수 있습니다.
+          </p>
         </div>
+
         <div class="games-shell">
-          <div class="game-board-panel">
+          <article class="game-card" data-game-shell="snake" data-active="true">
+            <div class="game-card-header">
+              <div>
+                <p class="eyebrow">Snake</p>
+                <h3>Arcade Runner</h3>
+              </div>
+              <span class="game-chip">Keyboard + Touch</span>
+            </div>
+
             <div class="game-status-bar" aria-live="polite">
               <span>Score: <strong id="score-value">0</strong></span>
               <span>Best: <strong id="best-score-value">0</strong></span>
               <span>Status: <strong id="game-status">Ready</strong></span>
             </div>
-            <canvas id="game-canvas" class="game-canvas" width="480" height="480" aria-label="Snake game board"></canvas>
+
+            <canvas
+              id="game-canvas"
+              class="game-canvas"
+              width="480"
+              height="480"
+              aria-label="Snake game board"
+            ></canvas>
+
             <p class="game-help">
-              방향키 또는 WASD로 이동, `P`로 일시정지, `R`로 재시작. 모바일에서는 아래 버튼을 사용하세요.
+              방향키나 WASD로 이동하고, `P`로 일시정지, `R`로 재시작할 수 있습니다. 모바일에서는
+              아래 터치 버튼으로 조작하세요.
             </p>
-          </div>
-          <aside class="games-copy game-controls">
+
             <div class="control-row">
               <button id="start-button" class="button button-primary" type="button">Start</button>
               <button id="pause-button" class="button button-secondary" type="button">Pause</button>
               <button id="restart-button" class="button button-secondary" type="button">Restart</button>
             </div>
 
-            <div class="touch-controls" aria-label="모바일 조작">
+            <div class="touch-controls" aria-label="Snake mobile controls">
               <button class="touch-button touch-up" type="button" data-direction="up" aria-label="위로 이동">▲</button>
               <div class="touch-middle">
                 <button class="touch-button touch-left" type="button" data-direction="left" aria-label="왼쪽으로 이동">◀</button>
-                <button class="touch-button touch-pause" type="button" data-action="pause" aria-label="일시정지">Ⅱ</button>
+                <button class="touch-button touch-pause" type="button" data-action="pause" aria-label="일시정지">⏸</button>
                 <button class="touch-button touch-right" type="button" data-direction="right" aria-label="오른쪽으로 이동">▶</button>
               </div>
               <button class="touch-button touch-down" type="button" data-direction="down" aria-label="아래로 이동">▼</button>
             </div>
+          </article>
 
-            <div class="game-notes">
-              <p>적 2개가 랜덤하게 움직이며 닿으면 게임이 끝납니다.</p>
-              <p>게임 오버 후 Restart로 다시 시작할 수 있습니다.</p>
+          <article class="game-card" data-game-shell="tetris" data-active="false" id="tetris-game">
+            <div class="game-card-header">
+              <div>
+                <p class="eyebrow">Tetris</p>
+                <h3>Mini Block Drop</h3>
+              </div>
+              <span class="game-chip">Keyboard + Touch</span>
             </div>
-          </aside>
+
+            <div class="game-status-bar" aria-live="polite">
+              <span>Score: <strong id="tetris-score-value">0</strong></span>
+              <span>Best: <strong id="tetris-best-score-value">0</strong></span>
+              <span>Status: <strong id="tetris-status">Ready</strong></span>
+            </div>
+
+            <canvas
+              id="tetris-canvas"
+              class="game-canvas"
+              width="480"
+              height="480"
+              aria-label="Tetris game board"
+            ></canvas>
+
+            <p class="game-help">
+              방향키 또는 WASD로 이동하고, 위쪽 화살표로 회전합니다. `Space`는 하드 드롭,
+              `P`는 일시정지, `R`은 재시작입니다.
+            </p>
+
+            <div class="control-row">
+              <button id="tetris-start-button" class="button button-primary" type="button" data-tetris-control="start">
+                Start
+              </button>
+              <button id="tetris-pause-button" class="button button-secondary" type="button" data-tetris-control="pause">
+                Pause
+              </button>
+              <button id="tetris-restart-button" class="button button-secondary" type="button" data-tetris-control="restart">
+                Restart
+              </button>
+            </div>
+
+            <div class="touch-controls touch-controls-tetris" aria-label="Tetris mobile controls">
+              <div class="touch-middle touch-middle-tetris">
+                <button class="touch-button touch-left" type="button" data-tetris-control="left" aria-label="왼쪽으로 이동">◀</button>
+                <button id="tetris-rotate-button" class="touch-button touch-rotate" type="button" data-tetris-control="rotate" aria-label="회전">⟳</button>
+                <button class="touch-button touch-right" type="button" data-tetris-control="right" aria-label="오른쪽으로 이동">▶</button>
+              </div>
+              <div class="touch-middle touch-middle-tetris">
+                <button class="touch-button touch-down" type="button" data-tetris-control="down" aria-label="아래로 이동">▼</button>
+                <button class="touch-button touch-drop" type="button" data-tetris-control="drop" aria-label="즉시 떨어뜨리기">⤓</button>
+                <button class="touch-button touch-pause" type="button" data-tetris-control="pause" aria-label="일시정지">⏸</button>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
       <section id="contact" class="card-section">
-        <h2>Contact</h2>
-        <p>이메일, GitHub, LinkedIn 같은 외부 링크를 연결할 수 있습니다.</p>
+        <div class="section-heading">
+          <p class="eyebrow">Contact</p>
+          <h2>연결하기</h2>
+        </div>
+        <p>
+          협업 제안이나 게임 개발 관련 이야기는 GitHub, LinkedIn, 이메일 등 원하는 채널로 이어질 수 있도록
+          여지를 남겨두었습니다.
+        </p>
       </section>
     </main>
   </body>

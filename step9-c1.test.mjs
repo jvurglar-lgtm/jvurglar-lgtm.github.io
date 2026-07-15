@@ -1,13 +1,11 @@
 import { readFileSync } from "node:fs";
 
-const styles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
 
 const checks = [
-  ["dark bg", /--bg:\s*#05070d;/.test(styles)],
-  ["elevated bg", /--bg-elevated:\s*#0b101a;/.test(styles)],
-  ["accent", /--accent:\s*#7dd3fc;/.test(styles)],
-  ["page bg", /background:\s*var\(--bg\)/.test(styles)],
-  ["button gradient", /linear-gradient\(135deg,\s*var\(--accent\),\s*var\(--accent-strong\)\)/.test(styles)],
+  ["game developer headline", /게임 개발자/.test(html)],
+  ["game developer bio", /브라우저 게임/.test(html)],
+  ["game portfolio framing", /포트폴리오/.test(html)],
 ];
 
 const missing = checks.filter(([, ok]) => !ok).map(([name]) => name);

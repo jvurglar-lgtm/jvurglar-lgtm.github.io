@@ -1,3 +1,5 @@
+import { createTetrisGame } from "./tetris.js";
+
 const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".site-nav");
 
@@ -9,14 +11,37 @@ if (navToggle && siteNav) {
   });
 }
 
-const canvas = document.querySelector("#game-canvas");
-const scoreValue = document.querySelector("#score-value");
-const bestScoreValue = document.querySelector("#best-score-value");
-const gameStatus = document.querySelector("#game-status");
-const startButton = document.querySelector("#start-button");
-const pauseButton = document.querySelector("#pause-button");
-const restartButton = document.querySelector("#restart-button");
-const touchButtons = Array.from(document.querySelectorAll(".touch-button"));
+const gameShells = Array.from(document.querySelectorAll("[data-game-shell]"));
+let activeGame = "snake";
+
+function setActiveGame(nextGame) {
+  activeGame = nextGame;
+  gameShells.forEach((shell) => {
+    shell.dataset.active = String(shell.dataset.gameShell === nextGame);
+  });
+}
+
+setActiveGame("snake");
+
+const snakeCanvas = document.querySelector("#game-canvas");
+const snakeScoreValue = document.querySelector("#score-value");
+const snakeBestScoreValue = document.querySelector("#best-score-value");
+const snakeStatusValue = document.querySelector("#game-status");
+const snakeStartButton = document.querySelector("#start-button");
+const snakePauseButton = document.querySelector("#pause-button");
+const snakeRestartButton = document.querySelector("#restart-button");
+const snakeTouchButtons = Array.from(
+  document.querySelectorAll('[data-game-shell="snake"] .touch-button'),
+);
+
+const tetrisRoot = document.querySelector("#tetris-game");
+const tetrisCanvas = document.querySelector("#tetris-canvas");
+const tetrisScoreValue = document.querySelector("#tetris-score-value");
+const tetrisBestScoreValue = document.querySelector("#tetris-best-score-value");
+const tetrisStatusValue = document.querySelector("#tetris-status");
+const tetrisStartButton = document.querySelector("#tetris-start-button");
+const tetrisPauseButton = document.querySelector("#tetris-pause-button");
+const tetrisRestartButton = document.querySelector("#tetris-restart-button");
 
 const CELL_COUNT = 20;
 const TICK_MS = 120;
@@ -25,7 +50,7 @@ const ENEMY_COUNT = 2;
 const BEST_SCORE_KEY = "jvurglar-lgtm-snake-best-score";
 const CENTER = Math.floor(CELL_COUNT / 2);
 
-const gameState = {
+const snakeState = {
   timer: null,
   enemyTimer: 0,
   status: "ready",
@@ -39,32 +64,44 @@ const gameState = {
   message: "Start를 눌러 게임을 시작하세요.",
 };
 
-const context = canvas?.getContext("2d");
+const snakeContext = snakeCanvas?.getContext("2d") ?? null;
 
-function setStatus(value, message) {
-  gameState.status = value;
-  if (gameStatus) {
-    gameStatus.textContent = message;
+const tetrisGame = createTetrisGame({
+  root: tetrisRoot,
+  canvas: tetrisCanvas,
+  scoreValue: tetrisScoreValue,
+  bestScoreValue: tetrisBestScoreValue,
+  statusValue: tetrisStatusValue,
+  startButton: tetrisStartButton,
+  pauseButton: tetrisPauseButton,
+  restartButton: tetrisRestartButton,
+  onActivate: () => setActiveGame("tetris"),
+});
+
+function updateSnakeStatus(value, message) {
+  snakeState.status = value;
+  if (snakeStatusValue) {
+    snakeStatusValue.textContent = message;
   }
 }
 
-function updateScoreBoard() {
-  if (scoreValue) {
-    scoreValue.textContent = String(gameState.score);
+function updateSnakeScoreboard() {
+  if (snakeScoreValue) {
+    snakeScoreValue.textContent = String(snakeState.score);
   }
-  if (bestScoreValue) {
-    bestScoreValue.textContent = String(gameState.bestScore);
+  if (snakeBestScoreValue) {
+    snakeBestScoreValue.textContent = String(snakeState.bestScore);
   }
 }
 
-function resizeCanvas() {
-  if (!canvas || !context) return;
-  const size = canvas.clientWidth || 480;
+function resizeSnakeCanvas() {
+  if (!snakeCanvas || !snakeContext) return;
+  const size = snakeCanvas.clientWidth || 480;
   const dpr = Math.max(window.devicePixelRatio || 1, 1);
-  canvas.width = Math.floor(size * dpr);
-  canvas.height = Math.floor(size * dpr);
-  context.setTransform(dpr, 0, 0, dpr, 0, 0);
-  render();
+  snakeCanvas.width = Math.floor(size * dpr);
+  snakeCanvas.height = Math.floor(size * dpr);
+  snakeContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+  renderSnake();
 }
 
 function createRandomCell(exclusions = []) {
@@ -87,69 +124,73 @@ function createEnemyPositions(exclusions = []) {
   return enemies;
 }
 
-function resetGame() {
-  gameState.direction = { x: 1, y: 0 };
-  gameState.queuedDirection = null;
-  gameState.snake = [
+function resetSnakeGame() {
+  snakeState.direction = { x: 1, y: 0 };
+  snakeState.queuedDirection = null;
+  snakeState.snake = [
     { x: CENTER - 1, y: CENTER },
     { x: CENTER - 2, y: CENTER },
     { x: CENTER - 3, y: CENTER },
   ];
-  gameState.food = createRandomCell(gameState.snake);
-  gameState.enemies = createEnemyPositions([...gameState.snake, gameState.food]);
-  gameState.score = 0;
-  gameState.enemyTimer = 0;
-  gameState.message = "게임 시작 대기 중";
-  updateScoreBoard();
-  setStatus("ready", "Ready");
-  render();
+  snakeState.food = createRandomCell(snakeState.snake);
+  snakeState.enemies = createEnemyPositions([...snakeState.snake, snakeState.food]);
+  snakeState.score = 0;
+  snakeState.enemyTimer = 0;
+  snakeState.message = "게임 시작 대기 중";
+  updateSnakeScoreboard();
+  updateSnakeStatus("ready", "Ready");
+  renderSnake();
 }
 
-function startLoop() {
-  if (gameState.timer) {
+function startSnakeLoop() {
+  if (snakeState.timer) {
     return;
   }
-  gameState.timer = window.setInterval(tick, TICK_MS);
+  snakeState.timer = window.setInterval(tickSnake, TICK_MS);
 }
 
-function stopLoop() {
-  if (gameState.timer) {
-    window.clearInterval(gameState.timer);
-    gameState.timer = null;
+function stopSnakeLoop() {
+  if (!snakeState.timer) {
+    return;
+  }
+  window.clearInterval(snakeState.timer);
+  snakeState.timer = null;
+}
+
+function startSnakeGame() {
+  setActiveGame("snake");
+  if (snakeState.status === "gameover") {
+    resetSnakeGame();
+  }
+
+  if (snakeState.status === "ready") {
+    updateSnakeStatus("playing", "Playing");
+    snakeState.message = "게임 진행 중";
+    startSnakeLoop();
+    renderSnake();
+  } else if (snakeState.status === "paused") {
+    updateSnakeStatus("playing", "Playing");
+    snakeState.message = "게임 재개";
+    startSnakeLoop();
+    renderSnake();
   }
 }
 
-function startGame() {
-  if (gameState.status === "gameover") {
-    resetGame();
-  }
-  if (gameState.status === "ready") {
-    setStatus("playing", "Playing");
-    gameState.message = "게임 진행 중";
-    startLoop();
-    render();
-  } else if (gameState.status === "paused") {
-    setStatus("playing", "Playing");
-    gameState.message = "게임 재개";
-    startLoop();
-    render();
-  }
-}
-
-function pauseGame() {
-  if (gameState.status === "playing") {
-    stopLoop();
-    setStatus("paused", "Paused");
-    gameState.message = "일시정지";
-    render();
+function pauseSnakeGame() {
+  setActiveGame("snake");
+  if (snakeState.status === "playing") {
+    stopSnakeLoop();
+    updateSnakeStatus("paused", "Paused");
+    snakeState.message = "일시정지";
+    renderSnake();
   }
 }
 
 function gameOver(reason) {
-  stopLoop();
-  setStatus("gameover", `Game Over (${reason})`);
-  gameState.message = reason;
-  render();
+  stopSnakeLoop();
+  updateSnakeStatus("gameover", `Game Over (${reason})`);
+  snakeState.message = reason;
+  renderSnake();
 }
 
 function isOppositeDirection(current, next) {
@@ -157,30 +198,32 @@ function isOppositeDirection(current, next) {
 }
 
 function queueDirection(nextDirection) {
-  if (isOppositeDirection(gameState.direction, nextDirection)) {
+  if (isOppositeDirection(snakeState.direction, nextDirection)) {
     return;
   }
 
-  if (gameState.queuedDirection && isOppositeDirection(gameState.queuedDirection, nextDirection)) {
+  if (snakeState.queuedDirection && isOppositeDirection(snakeState.queuedDirection, nextDirection)) {
     return;
   }
 
-  gameState.queuedDirection = nextDirection;
-  if (gameState.status === "ready") {
-    startGame();
+  snakeState.queuedDirection = nextDirection;
+  if (snakeState.status === "ready") {
+    startSnakeGame();
   }
 }
 
 function maybeApplyQueuedDirection() {
-  if (!gameState.queuedDirection) {
+  if (!snakeState.queuedDirection) {
     return;
   }
-  if (isOppositeDirection(gameState.direction, gameState.queuedDirection)) {
-    gameState.queuedDirection = null;
+
+  if (isOppositeDirection(snakeState.direction, snakeState.queuedDirection)) {
+    snakeState.queuedDirection = null;
     return;
   }
-  gameState.direction = gameState.queuedDirection;
-  gameState.queuedDirection = null;
+
+  snakeState.direction = snakeState.queuedDirection;
+  snakeState.queuedDirection = null;
 }
 
 function pickEnemyNextCell(enemy, exclusions = []) {
@@ -207,28 +250,26 @@ function pickEnemyNextCell(enemy, exclusions = []) {
 
 function moveEnemies() {
   const nextEnemies = [];
-  for (const enemy of gameState.enemies) {
-    const nextEnemy = pickEnemyNextCell(enemy, [...gameState.snake, gameState.food, ...nextEnemies]);
+  for (const enemy of snakeState.enemies) {
+    const nextEnemy = pickEnemyNextCell(enemy, [...snakeState.snake, snakeState.food, ...nextEnemies]);
     nextEnemies.push(nextEnemy);
   }
-  gameState.enemies = nextEnemies;
-}
-
-function enemyTouchesSnake(enemy) {
-  return gameState.snake.some((segment) => segment.x === enemy.x && segment.y === enemy.y);
+  snakeState.enemies = nextEnemies;
 }
 
 function anyEnemyTouchesSnake() {
-  return gameState.enemies.some(enemyTouchesSnake);
+  return snakeState.enemies.some((enemy) =>
+    snakeState.snake.some((segment) => segment.x === enemy.x && segment.y === enemy.y),
+  );
 }
 
-function tick() {
+function tickSnake() {
   maybeApplyQueuedDirection();
 
-  const head = gameState.snake[0];
+  const head = snakeState.snake[0];
   const nextHead = {
-    x: head.x + gameState.direction.x,
-    y: head.y + gameState.direction.y,
+    x: head.x + snakeState.direction.x,
+    y: head.y + snakeState.direction.y,
   };
 
   if (nextHead.x < 0 || nextHead.y < 0 || nextHead.x >= CELL_COUNT || nextHead.y >= CELL_COUNT) {
@@ -236,33 +277,33 @@ function tick() {
     return;
   }
 
-  if (gameState.snake.some((segment) => segment.x === nextHead.x && segment.y === nextHead.y)) {
+  if (snakeState.snake.some((segment) => segment.x === nextHead.x && segment.y === nextHead.y)) {
     gameOver("자기 몸과 충돌");
     return;
   }
 
-  if (gameState.enemies.some((enemy) => enemy.x === nextHead.x && enemy.y === nextHead.y)) {
+  if (snakeState.enemies.some((enemy) => enemy.x === nextHead.x && enemy.y === nextHead.y)) {
     gameOver("적과 충돌");
     return;
   }
 
-  gameState.snake.unshift(nextHead);
+  snakeState.snake.unshift(nextHead);
 
-  const ateFood = nextHead.x === gameState.food.x && nextHead.y === gameState.food.y;
+  const ateFood = nextHead.x === snakeState.food.x && nextHead.y === snakeState.food.y;
   if (ateFood) {
-    gameState.score += 1;
-    if (gameState.score > gameState.bestScore) {
-      gameState.bestScore = gameState.score;
-      localStorage.setItem(BEST_SCORE_KEY, String(gameState.bestScore));
+    snakeState.score += 1;
+    if (snakeState.score > snakeState.bestScore) {
+      snakeState.bestScore = snakeState.score;
+      localStorage.setItem(BEST_SCORE_KEY, String(snakeState.bestScore));
     }
-    gameState.food = createRandomCell([...gameState.snake, ...gameState.enemies]);
-    gameState.message = "먹이를 먹었습니다";
+    snakeState.food = createRandomCell([...snakeState.snake, ...snakeState.enemies]);
+    snakeState.message = "먹이를 먹었습니다";
   } else {
-    gameState.snake.pop();
+    snakeState.snake.pop();
   }
 
-  gameState.enemyTimer += 1;
-  if (gameState.enemyTimer % ENEMY_STEP_EVERY === 0) {
+  snakeState.enemyTimer += 1;
+  if (snakeState.enemyTimer % ENEMY_STEP_EVERY === 0) {
     moveEnemies();
     if (anyEnemyTouchesSnake()) {
       gameOver("적과 충돌");
@@ -270,83 +311,93 @@ function tick() {
     }
   }
 
-  updateScoreBoard();
-  setStatus("playing", "Playing");
-  render();
+  updateSnakeScoreboard();
+  updateSnakeStatus("playing", "Playing");
+  renderSnake();
 }
 
-function drawCell(x, y, color, inset = 0) {
-  if (!context) return;
-  const cellSize = canvas.clientWidth / CELL_COUNT;
+function drawSnakeCell(x, y, color, inset = 0) {
+  if (!snakeContext || !snakeCanvas) return;
+  const cellSize = snakeCanvas.clientWidth / CELL_COUNT;
   const padding = cellSize * inset;
-  context.fillStyle = color;
-  context.fillRect(x * cellSize + padding, y * cellSize + padding, cellSize - padding * 2, cellSize - padding * 2);
+  snakeContext.fillStyle = color;
+  snakeContext.fillRect(x * cellSize + padding, y * cellSize + padding, cellSize - padding * 2, cellSize - padding * 2);
 }
 
-function renderGrid() {
-  if (!context) return;
-  const cellSize = canvas.clientWidth / CELL_COUNT;
-  context.strokeStyle = "rgba(123, 255, 172, 0.08)";
-  context.lineWidth = 1;
+function renderSnakeGrid() {
+  if (!snakeContext || !snakeCanvas) return;
+  const cellSize = snakeCanvas.clientWidth / CELL_COUNT;
+  snakeContext.strokeStyle = "rgba(24, 119, 242, 0.08)";
+  snakeContext.lineWidth = 1;
 
   for (let i = 0; i <= CELL_COUNT; i += 1) {
-    context.beginPath();
-    context.moveTo(i * cellSize, 0);
-    context.lineTo(i * cellSize, canvas.clientHeight);
-    context.stroke();
+    snakeContext.beginPath();
+    snakeContext.moveTo(i * cellSize, 0);
+    snakeContext.lineTo(i * cellSize, snakeCanvas.clientHeight);
+    snakeContext.stroke();
 
-    context.beginPath();
-    context.moveTo(0, i * cellSize);
-    context.lineTo(canvas.clientWidth, i * cellSize);
-    context.stroke();
+    snakeContext.beginPath();
+    snakeContext.moveTo(0, i * cellSize);
+    snakeContext.lineTo(snakeCanvas.clientWidth, i * cellSize);
+    snakeContext.stroke();
   }
 }
 
-function render() {
-  if (!context || !canvas) return;
+function renderSnake() {
+  if (!snakeContext || !snakeCanvas) return;
 
-  const cssWidth = canvas.clientWidth;
-  const cssHeight = canvas.clientHeight;
-  context.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-  context.fillStyle = "#03130c";
-  context.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-
-  renderGrid();
-
+  const cssWidth = snakeCanvas.clientWidth;
   const scale = cssWidth / CELL_COUNT;
-  gameState.food && drawCell(gameState.food.x, gameState.food.y, "#ffd166", 0.2);
-  gameState.enemies.forEach((enemy, index) => {
-    const color = index === 0 ? "#ff6b6b" : "#c084fc";
-    drawCell(enemy.x, enemy.y, color, 0.15);
+
+  snakeContext.clearRect(0, 0, snakeCanvas.clientWidth, snakeCanvas.clientHeight);
+  snakeContext.fillStyle = "#edf3fb";
+  snakeContext.fillRect(0, 0, snakeCanvas.clientWidth, snakeCanvas.clientHeight);
+
+  renderSnakeGrid();
+
+  if (snakeState.food) {
+    drawSnakeCell(snakeState.food.x, snakeState.food.y, "#f7c948", 0.2);
+  }
+
+  snakeState.enemies.forEach((enemy, index) => {
+    const color = index === 0 ? "#ff6b6b" : "#b28dff";
+    drawSnakeCell(enemy.x, enemy.y, color, 0.15);
   });
 
-  gameState.snake.forEach((segment, index) => {
-    const color = index === 0 ? "#7bffac" : "rgba(123, 255, 172, 0.82)";
-    drawCell(segment.x, segment.y, color, index === 0 ? 0.12 : 0.18);
+  snakeState.snake.forEach((segment, index) => {
+    const color = index === 0 ? "#1877f2" : "rgba(24, 119, 242, 0.82)";
+    drawSnakeCell(segment.x, segment.y, color, index === 0 ? 0.12 : 0.18);
   });
 
-  context.fillStyle = "rgba(231, 247, 239, 0.88)";
-  context.font = `600 ${Math.max(14, scale * 0.55)}px Inter, sans-serif`;
-  context.textAlign = "left";
-  context.fillText(gameState.message, 16, 28);
+  snakeContext.fillStyle = "rgba(28, 30, 33, 0.9)";
+  snakeContext.font = `600 ${Math.max(14, scale * 0.55)}px "SF Pro Text", "Segoe UI", sans-serif`;
+  snakeContext.textAlign = "left";
+  snakeContext.fillText(snakeState.message, 16, 28);
 
-  if (gameState.status !== "playing") {
-    context.fillStyle = "rgba(3, 18, 12, 0.55)";
-    context.fillRect(0, canvas.clientHeight / 2 - 36, canvas.clientWidth, 72);
-    context.fillStyle = "#e7f7ef";
-    context.textAlign = "center";
-    context.font = `700 ${Math.max(18, scale * 0.8)}px Inter, sans-serif`;
+  if (snakeState.status !== "playing") {
+    snakeContext.fillStyle = "rgba(255, 255, 255, 0.62)";
+    snakeContext.fillRect(0, snakeCanvas.clientHeight / 2 - 36, snakeCanvas.clientWidth, 72);
+    snakeContext.fillStyle = "#1c1e21";
+    snakeContext.textAlign = "center";
+    snakeContext.font = `700 ${Math.max(18, scale * 0.8)}px "SF Pro Display", "Segoe UI", sans-serif`;
     const overlayText =
-      gameState.status === "gameover"
+      snakeState.status === "gameover"
         ? "Game Over"
-        : gameState.status === "paused"
+        : snakeState.status === "paused"
           ? "Paused"
           : "Ready";
-    context.fillText(overlayText, canvas.clientWidth / 2, canvas.clientHeight / 2 + 8);
+    snakeContext.fillText(overlayText, snakeCanvas.clientWidth / 2, snakeCanvas.clientHeight / 2 + 8);
   }
 }
 
-function handleDirectionKey(key) {
+function restartSnakeGame() {
+  setActiveGame("snake");
+  stopSnakeLoop();
+  resetSnakeGame();
+  startSnakeGame();
+}
+
+function handleSnakeKey(key) {
   const directions = {
     ArrowUp: { x: 0, y: -1 },
     ArrowRight: { x: 1, y: 0 },
@@ -363,41 +414,53 @@ function handleDirectionKey(key) {
   };
 
   if (key === "p" || key === "P") {
-    if (gameState.status === "playing") {
-      pauseGame();
-    } else if (gameState.status === "paused" || gameState.status === "ready") {
-      startGame();
+    setActiveGame("snake");
+    if (snakeState.status === "playing") {
+      pauseSnakeGame();
+    } else if (snakeState.status === "paused" || snakeState.status === "ready") {
+      startSnakeGame();
     }
     return;
   }
 
   if (key === "r" || key === "R") {
-    restartGame();
+    setActiveGame("snake");
+    restartSnakeGame();
     return;
   }
 
   const direction = directions[key];
   if (direction) {
+    setActiveGame("snake");
     queueDirection(direction);
   }
 }
 
-function restartGame() {
-  stopLoop();
-  resetGame();
-  startGame();
-}
+snakeCanvas?.addEventListener("pointerdown", () => setActiveGame("snake"));
 
 document.addEventListener("keydown", (event) => {
-  handleDirectionKey(event.key);
+  if (activeGame === "tetris" && tetrisGame.handleKeyDown(event.key)) {
+    return;
+  }
+  handleSnakeKey(event.key);
 });
 
-startButton?.addEventListener("click", startGame);
-pauseButton?.addEventListener("click", pauseGame);
-restartButton?.addEventListener("click", restartGame);
+snakeStartButton?.addEventListener("click", () => {
+  setActiveGame("snake");
+  startSnakeGame();
+});
+snakePauseButton?.addEventListener("click", () => {
+  setActiveGame("snake");
+  pauseSnakeGame();
+});
+snakeRestartButton?.addEventListener("click", () => {
+  setActiveGame("snake");
+  restartSnakeGame();
+});
 
-touchButtons.forEach((button) => {
+snakeTouchButtons.forEach((button) => {
   button.addEventListener("click", () => {
+    setActiveGame("snake");
     const directionName = button.dataset.direction;
     const action = button.dataset.action;
 
@@ -413,16 +476,16 @@ touchButtons.forEach((button) => {
     }
 
     if (action === "pause") {
-      if (gameState.status === "playing") {
-        pauseGame();
+      if (snakeState.status === "playing") {
+        pauseSnakeGame();
       } else {
-        startGame();
+        startSnakeGame();
       }
     }
   });
 });
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", resizeSnakeCanvas);
 
-resetGame();
-resizeCanvas();
+resetSnakeGame();
+resizeSnakeCanvas();
