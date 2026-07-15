@@ -29,3 +29,20 @@
 - Live content: PASS
 - Current state: `DEPLOYED`
 - Notes: token was not kept in `github_token.txt`
+
+## Step 9 / C1
+- Change item: dark modern theme
+- Failing test first: `step9-c1.test.mjs`
+- Minimal Act: updated color tokens and page/card/button/game surfaces
+- Local verify: PASS
+- Claude verify: PASS
+- Regression impact: no layout or interaction regressions
+
+## Step 9 / C2
+- Change item: two random enemies
+- Failing test first: `step9-c2.test.mjs`
+- Claude-found bug: `pickEnemyNextCell` returned `undefined` instead of `next`
+- Minimal Act: switched to `gameState.enemies` array, fixed enemy movement return value, updated copy text
+- Local verify: PASS
+- Claude verify: PASS
+- Regression impact: score, pause, restart, keyboard, touch, and theme checks remained PASS

@@ -21,6 +21,7 @@ const touchButtons = Array.from(document.querySelectorAll(".touch-button"));
 const CELL_COUNT = 20;
 const TICK_MS = 120;
 const ENEMY_STEP_EVERY = 3;
+const ENEMY_COUNT = 2;
 const BEST_SCORE_KEY = "jvurglar-lgtm-snake-best-score";
 const CENTER = Math.floor(CELL_COUNT / 2);
 
@@ -32,7 +33,7 @@ const gameState = {
   queuedDirection: null,
   snake: [],
   food: { x: 0, y: 0 },
-  enemy: { x: 0, y: 0 },
+  enemies: [],
   score: 0,
   bestScore: Number.parseInt(localStorage.getItem(BEST_SCORE_KEY) || "0", 10) || 0,
   message: "Start를 눌러 게임을 시작하세요.",
@@ -77,6 +78,15 @@ function createRandomCell(exclusions = []) {
   return cell;
 }
 
+function createEnemyPositions(exclusions = []) {
+  const enemies = [];
+  while (enemies.length < ENEMY_COUNT) {
+    const next = createRandomCell([...exclusions, ...enemies]);
+    enemies.push(next);
+  }
+  return enemies;
+}
+
 function resetGame() {
   gameState.direction = { x: 1, y: 0 };
   gameState.queuedDirection = null;
@@ -86,7 +96,7 @@ function resetGame() {
     { x: CENTER - 3, y: CENTER },
   ];
   gameState.food = createRandomCell(gameState.snake);
-  gameState.enemy = createRandomCell([...gameState.snake, gameState.food]);
+  gameState.enemies = createEnemyPositions([...gameState.snake, gameState.food]);
   gameState.score = 0;
   gameState.enemyTimer = 0;
   gameState.message = "게임 시작 대기 중";
@@ -173,7 +183,7 @@ function maybeApplyQueuedDirection() {
   gameState.queuedDirection = null;
 }
 
-function moveEnemy() {
+function pickEnemyNextCell(enemy, exclusions = []) {
   const directions = [
     { x: 0, y: -1 },
     { x: 1, y: 0 },
@@ -181,21 +191,35 @@ function moveEnemy() {
     { x: -1, y: 0 },
   ];
   const shuffled = directions.sort(() => Math.random() - 0.5);
-  const snakeCells = gameState.snake;
 
   for (const delta of shuffled) {
     const next = {
-      x: (gameState.enemy.x + delta.x + CELL_COUNT) % CELL_COUNT,
-      y: (gameState.enemy.y + delta.y + CELL_COUNT) % CELL_COUNT,
+      x: (enemy.x + delta.x + CELL_COUNT) % CELL_COUNT,
+      y: (enemy.y + delta.y + CELL_COUNT) % CELL_COUNT,
     };
-    if (
-      !snakeCells.some((segment) => segment.x === next.x && segment.y === next.y) &&
-      !(next.x === gameState.food.x && next.y === gameState.food.y)
-    ) {
-      gameState.enemy = next;
-      return;
+    if (!exclusions.some((item) => item.x === next.x && item.y === next.y)) {
+      return next;
     }
   }
+
+  return enemy;
+}
+
+function moveEnemies() {
+  const nextEnemies = [];
+  for (const enemy of gameState.enemies) {
+    const nextEnemy = pickEnemyNextCell(enemy, [...gameState.snake, gameState.food, ...nextEnemies]);
+    nextEnemies.push(nextEnemy);
+  }
+  gameState.enemies = nextEnemies;
+}
+
+function enemyTouchesSnake(enemy) {
+  return gameState.snake.some((segment) => segment.x === enemy.x && segment.y === enemy.y);
+}
+
+function anyEnemyTouchesSnake() {
+  return gameState.enemies.some(enemyTouchesSnake);
 }
 
 function tick() {
@@ -217,7 +241,7 @@ function tick() {
     return;
   }
 
-  if (gameState.enemy.x === nextHead.x && gameState.enemy.y === nextHead.y) {
+  if (gameState.enemies.some((enemy) => enemy.x === nextHead.x && enemy.y === nextHead.y)) {
     gameOver("적과 충돌");
     return;
   }
@@ -231,7 +255,7 @@ function tick() {
       gameState.bestScore = gameState.score;
       localStorage.setItem(BEST_SCORE_KEY, String(gameState.bestScore));
     }
-    gameState.food = createRandomCell([...gameState.snake, gameState.enemy]);
+    gameState.food = createRandomCell([...gameState.snake, ...gameState.enemies]);
     gameState.message = "먹이를 먹었습니다";
   } else {
     gameState.snake.pop();
@@ -239,8 +263,8 @@ function tick() {
 
   gameState.enemyTimer += 1;
   if (gameState.enemyTimer % ENEMY_STEP_EVERY === 0) {
-    moveEnemy();
-    if (gameState.enemy.x === nextHead.x && gameState.enemy.y === nextHead.y) {
+    moveEnemies();
+    if (anyEnemyTouchesSnake()) {
       gameOver("적과 충돌");
       return;
     }
@@ -291,7 +315,10 @@ function render() {
 
   const scale = cssWidth / CELL_COUNT;
   gameState.food && drawCell(gameState.food.x, gameState.food.y, "#ffd166", 0.2);
-  gameState.enemy && drawCell(gameState.enemy.x, gameState.enemy.y, "#ff6b6b", 0.15);
+  gameState.enemies.forEach((enemy, index) => {
+    const color = index === 0 ? "#ff6b6b" : "#c084fc";
+    drawCell(enemy.x, enemy.y, color, 0.15);
+  });
 
   gameState.snake.forEach((segment, index) => {
     const color = index === 0 ? "#7bffac" : "rgba(123, 255, 172, 0.82)";
