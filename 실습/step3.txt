@@ -1,119 +1,68 @@
-현재 프로젝트의 AORR.md와 저장소 구조를 읽고, 이 정적 웹사이트 개발 업무를 위한 Verifier 중심의 Self-Correcting TDD 루프를 설계해줘.
+[교육생 설정]
+- GitHub Pages 주소: https://[username].github.io
+- GitHub 저장소: https://github.com/[username]/[username].github.io.git
+- GitHub 토큰 파일: github_token.txt
+- 프로필 참고 자료: [CV.pdf 또는 없음]
+- 웹사이트 디자인 참고: [없음, 다크 테마, 메트릭스 느낌, 페이스북 등등]
+- 게임 추가 기능: [없음 또는 원하는 기능 - 랜덤하게 움직이는 적]
 
-이 프로젝트는 GitHub Pages에서 동작하는 정적 HTML, CSS, JavaScript 웹사이트야.
 
-프로젝트에 실제로 존재하거나 현재 환경에서 실행 가능한 검증 도구를 먼저 확인해줘. 존재하지 않는 npm 명령어나 테스트 명령어를 임의로 만들지 마.
+[Step 3 - Self-Correcting TDD 설계]
 
-다음 내용을 포함해:
+AORR.md와 저장소 구조를 읽고 Verifier 중심 Self-Correcting TDD 루프를 설계해.
 
-1. 기본 파일 검증
-   - 루트의 index.html 존재
-   - CSS 및 JavaScript 연결
-   - 잘못된 로컬 파일 경로 확인
-   - 대소문자 불일치 확인
-   - GitHub Pages에서 사용할 수 없는 절대 로컬 경로 확인
+기본 모드:
+- Codex = Worker: 코드 분석과 최소 수정
+- Claude Code CLI Sonnet = Verifier: 변경 전·후 테스트 실행
+- Codex는 Claude가 실행한 테스트를 중복 실행하지 않음
 
-2. HTML 검증
-   - 기본 문서 구조
-   - title, meta viewport
-   - 시맨틱 태그
-   - 내비게이션 링크
-   - Games 영역
-   - 이미지 alt 속성
-   - 깨진 내부 링크
+먼저 확인할 것:
+1. `claude` 명령 사용 가능 여부
+2. 로그인 및 실행 가능 여부
+3. 사용 가능한 Sonnet 모델
+4. Sonnet 5가 실제 사용 가능하면 사용
+5. 불가능하면 사용 가능한 최신 Sonnet 모델 사용
+6. 실제 모델명을 AORR.md와 MEMORY.md에 기록
+7. Claude 사용 불가 시 CODEX_FALLBACK 모드 사용
 
-3. CSS 검증
-   - 데스크톱 화면
-   - 태블릿 화면
-   - 모바일 화면
-   - 가로 스크롤 발생 여부
-   - 내비게이션 및 Games UI 반응형 동작
+AORR.md에 `Self-Correcting TDD Loop`를 추가해.
 
-4. JavaScript 검증
-   - 문법 오류
-   - 브라우저 콘솔 오류
-   - DOM 요소 null 참조
-   - 중복 이벤트 리스너
-   - 페이지 로드 시 오류
+실행 순서:
+1. Claude가 변경 전 테스트 실행
+2. Claude가 실패 항목, 핵심 오류, 관련 파일, fingerprint 보고
+3. Codex가 원인 하나에 필요한 최소 코드만 수정
+4. Claude가 동일 테스트 재실행
+5. 실패 시 Claude가 새 결과와 fingerprint 보고
+6. Codex가 최소 수정 후 Claude에 재검증 요청
+7. Claude의 전체 테스트가 통과해야 PASSED
 
-5. 지렁이 게임 검증
-   - 게임 시작
-   - 일시정지
-   - 다시 시작
-   - 점수 증가
-   - 음식 생성
-   - 벽 또는 자기 몸 충돌
-   - 키보드 방향키 또는 WASD 조작
-   - 모바일 버튼 또는 터치 조작
-   - 반대 방향 즉시 전환 방지
-   - Games 탭을 다시 열었을 때 중복 실행 방지
+검증 범위:
+- 파일 존재와 상대 경로
+- HTML 구조와 내부 링크
+- CSS 반응형
+- JavaScript 오류
+- 지렁이 게임 기능과 입력
+- 로컬 HTTP 응답
+- 375px, 768px, 1440px
+- GitHub Pages 호환성
 
-6. 로컬 실행 검증
-   - 가능한 경우 python3 -m http.server 등의 로컬 정적 서버 사용
-   - HTTP 응답 확인
-   - index.html 정상 로드 확인
-   - CSS와 JavaScript 파일 응답 확인
-
-7. 브라우저 검증
-   가능한 도구가 있다면 다음 viewport를 확인:
-   - 모바일: 약 375px
-   - 태블릿: 약 768px
-   - 데스크톱: 약 1440px
-
-8. GitHub Pages 호환성
-   - 루트 index.html
-   - 정적 상대 경로
-   - 서버 전용 기능 미사용
-   - 로컬 파일 시스템 의존성 미사용
-   - 백엔드 API 의존성 미사용
-
-실패 로그에서는 다음을 수집하도록 해:
-
-- 실행 명령어
+실패 기록:
+- 실행 주체와 모델
+- 명령
 - exit code
-- 실패한 검증 항목
-- 핵심 오류 메시지
-- 관련 파일과 라인
-- 브라우저 콘솔 메시지
-- 오류 fingerprint
+- 핵심 오류
+- 관련 파일·라인
+- fingerprint
+- 최종 상태
 
-실패 원인은 다음 중 하나로 분류해:
+Retry:
+- 오류당 최대 3회
+- 동일 fingerprint 2회면 중지
+- 한 Retry에서는 원인 하나와 최소 파일만 수정
+- 테스트 삭제·완화 금지
 
-HTML_STRUCTURE
-CSS_RESPONSIVE
-JAVASCRIPT
-GAME_LOGIC
-GAME_CONTROL
-CONTENT
-TEST
-ENVIRONMENT
-GITHUB_PERMISSION
-DEPLOYMENT
-UNKNOWN
+Fallback:
+- Claude CLI를 사용할 수 없을 때만 Codex가 수정과 테스트를 모두 수행
+- Fallback 이유와 사용 여부를 기록
 
-최소 수정 원칙:
-
-- 한 Retry에서는 하나의 원인만 수정
-- 관련 파일만 수정
-- 테스트 삭제 또는 검증 기준 완화 금지
-- 전체 사이트의 불필요한 재작성 금지
-- 이미 통과한 기능을 깨뜨리는 수정 금지
-- 외부 프레임워크로 임의 전환 금지
-
-Retry 정책:
-
-- 하나의 오류에 대해 최대 3회
-- 동일 오류 fingerprint가 2회 반복되면 중지
-- 각 Retry마다 가설, 변경 파일, 실행 명령어, 결과 기록
-- 환경 또는 권한 문제는 코드 수정으로 해결하려 하지 않음
-
-가능하면 Claude Code CLI를 독립 Verifier로 활용해줘.
-
-Claude Code CLI에서 Sonnet 5 사용 가능 여부를 먼저 확인하고, 실제로 사용 가능한 경우에만 Sonnet 5를 사용해.
-사용할 수 없다면 현재 사용 가능한 Sonnet 모델을 사용하고 실제 모델명을 기록하도록 해줘.
-
-이 단계에서는 아직 코드를 수정하거나 테스트를 실행하지 마.
-
-결과를 AORR.md의 기존 내용 아래에
-'Self-Correcting TDD Loop'
-섹션으로 추가해줘.
+이 단계에서는 코드 수정, 테스트 실행, push, 배포를 하지 마.
