@@ -13,16 +13,16 @@
 - Last test: `PASS`
 
 ## Current State
-- 상태: `DEPLOY_APPROVAL_REQUIRED`
-- 완료 루프: Step 9 변경 요청 구현 및 회귀 검증
-- 다음 루프: 사용자 승인 대기
+- 상태: `DEPLOYED`
+- 완료 루프: Step 9 변경 요청 구현, 배포, 회귀 검증
+- 다음 루프: 없음
 - Retry: 0
 - fingerprint: 없음
 - blocker: `ANTHROPIC_API_KEY`가 있으면 Claude 실행 충돌
-- 마지막 정상 commit·URL: `92a5025` / `https://jvurglar-lgtm.github.io`
+- 마지막 정상 commit·URL: `d392efd` / `https://jvurglar-lgtm.github.io`
 - git 상태: dirty
-- rollback 기준: 승인 전 변경은 `92a5025`로 되돌린다.
-- 요약: 어두운 모던 테마와 랜덤 적 2개를 반영했고, 회귀 검증까지 통과했다.
+- rollback 기준: 필요 시 `d392efd` 이전 커밋으로 되돌린다.
+- 요약: 어두운 모던 테마와 랜덤 적 2개를 반영했고, 라이브 검증까지 통과했다.
 
 ## Acceptance
 - 데스크톱, 태블릿, 모바일에서 반응형으로 보인다.
@@ -44,6 +44,6 @@
 ## Recent Loops
 | Loop | 상태 | 실행 모드·모델 | 변경 파일 | 테스트 결과 | Retry | 다음 작업 |
 |---|---|---|---|---|---:|---|
-| 1 | DEPLOY_APPROVAL_REQUIRED | CLAUDE_VERIFIER / claude-sonnet-4-6 | styles.css, step9-c1.test.mjs | PASS | 0 | C1 배포 승인 대기 |
-| 2 | DEPLOY_APPROVAL_REQUIRED | CLAUDE_VERIFIER / claude-sonnet-4-6 | index.html, script.js, step9-c2.test.mjs | PASS | 1 | C2 회귀 검증 완료 |
-| 3 | DEPLOY_APPROVAL_REQUIRED | CLAUDE_VERIFIER / claude-sonnet-4-6 | index.html, styles.css, script.js, step9-c1.test.mjs, step9-c2.test.mjs | PASS | 0 | 사용자 승인 대기 |
+| 1 | DEPLOYED | CLAUDE_VERIFIER / claude-sonnet-4-6 | styles.css, step9-c1.test.mjs | PASS | 0 | C1 배포 반영 |
+| 2 | DEPLOYED | CLAUDE_VERIFIER / claude-sonnet-4-6 | index.html, script.js, step9-c2.test.mjs | PASS | 1 | C2 회귀 수정 |
+| 3 | DEPLOYED | CLAUDE_VERIFIER / claude-sonnet-4-6 | index.html, styles.css, script.js, step9-c1.test.mjs, step9-c2.test.mjs | PASS | 0 | 종료 |
