@@ -21,3 +21,11 @@
 - Claude verify: PASS
 - Current state: `DEPLOY_APPROVAL_REQUIRED`
 - Next: user approval before commit/push/deploy
+
+## Deploy / Final
+- Commit: `a917ef8`
+- Push: `main -> origin/main` on `https://github.com/jvurglar-lgtm/jvurglar-lgtm.github.io.git`
+- Live check: `https://jvurglar-lgtm.github.io` returned `200`
+- Live content: PASS
+- Current state: `DEPLOYED`
+- Notes: token was not kept in `github_token.txt`

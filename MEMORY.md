@@ -13,14 +13,14 @@
 - Last test: `PASS`
 
 ## Current State
-- 상태: `DEPLOY_APPROVAL_REQUIRED`
-- 완료 루프: Step 7 전체 구현
-- 다음 루프: 사용자 배포 승인 대기
+- 상태: `DEPLOYED`
+- 완료 루프: Step 7 전체 구현 및 배포
+- 다음 루프: 없음
 - Retry: 0
 - fingerprint: 없음
 - blocker: `ANTHROPIC_API_KEY`가 있으면 Claude 실행 충돌
-- 마지막 정상 commit·URL: 없음
-- 요약: `index.html`, `styles.css`, `script.js`에 반응형 네비게이션, 지렁이 게임, 키보드/터치 조작, 랜덤 적을 구현했다.
+- 마지막 정상 commit·URL: `a917ef8` / `https://jvurglar-lgtm.github.io`
+- 요약: `index.html`, `styles.css`, `script.js`에 반응형 네비게이션, 지렁이 게임, 키보드/터치 조작, 랜덤 적을 구현하고 배포했다.
 
 ## Acceptance
 - 데스크톱, 태블릿, 모바일에서 반응형으로 보인다.
@@ -44,3 +44,4 @@
 |---|---|---|---|---|---:|---|
 | 1 | PASSED | CLAUDE_VERIFIER / claude-sonnet-4-6 | index.html, styles.css, script.js | PASS | 0 | Step 6 지렁이 게임 본체 준비 |
 | 2 | DEPLOY_APPROVAL_REQUIRED | CLAUDE_VERIFIER / claude-sonnet-4-6 | index.html, styles.css, script.js, step7.test.mjs | PASS | 0 | 사용자 배포 승인 대기 |
+| 3 | DEPLOYED | CLAUDE_VERIFIER / claude-sonnet-4-6 | commit `a917ef8` | PASS | 0 | 종료 |
